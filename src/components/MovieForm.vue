@@ -12,12 +12,26 @@
       <label for="poster" class="form-label">Poster</label>
       <input type="file" name="poster" @change="handleFileChange" class="form-control" />
     </div>
+
+    <div v-if="successMessage" class="alert alert-success" role="alert">
+      {{ successMessage }}
+    </div>
+
+    <div v-if="errorMessages.length > 0" class="alert alert-danger" role="alert">
+      <ul>
+        <li v-for="error in errorMessages" :key="error">{{ error }}</li>
+      </ul>
+    </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </template>
 
 <script setup>
 import { ref, onMounted  } from 'vue';
+
+const successMessage = ref('');
+const errorMessages = ref([]);
 
 const movie = ref({
   title: '',
@@ -27,7 +41,7 @@ const movie = ref({
 
 const saveMovie = () => {
   let movieForm = document.getElementById('movieForm'); 
-  let form_data = new FormData(movieForm);
+  let formData = new FormData(movieForm);
 
   formData.append('title', movie.value.title);
   formData.append('description', movie.value.description);
@@ -45,10 +59,16 @@ const saveMovie = () => {
   }) 
   .then(function (data) { 
     // display a success message 
-    console.log(data); 
+    successMessage.value = data.message;
+    errorMessages.value = [];
+    
+    //console.log(data); 
   }) 
   .catch(function (error) { 
-    console.log(error); 
+    successMessage.value = '';
+    errorMessages.value = ['Failed to save movie. Please try again.'];
+    
+    //console.log(error); 
   });
 };
 
