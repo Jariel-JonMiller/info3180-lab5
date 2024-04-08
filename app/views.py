@@ -6,13 +6,14 @@ This file creates your application.
 """
 
 from app import app
-from flask import render_template, request, jsonify, send_file
+from flask import render_template, request, jsonify, send_file, send_from_directory
 from flask_wtf.csrf import generate_csrf
 from .forms import MovieForm
 from .models import Movie
-from __init__ import db
+from .__init__ import db
 import os
 
+UPLOADS_FOLDER = 'uploads'
 
 ###
 # Routing for your application.
@@ -47,9 +48,34 @@ def movies():
     else:
         return jsonify({'errors': form_errors(form)})
 
+@app.route('/api/v1/movies', methods=['GET'])
+def get_movies():
+    movies = Movie.query.all()
+
+    serialized_movies = []
+    for movie in movies:
+        serialized_movie = {
+            'id': movie.id,
+            'title': movie.title,
+            'description': movie.description,
+            'poster': movie.poster  # Assuming 'poster' is a URL to the movie poster
+        }
+        serialized_movies.append(serialized_movie)
+
+    return jsonify({'movies': serialized_movies})
+
 @app.route('/api/v1/csrf-token', methods=['GET']) 
 def get_csrf(): 
     return jsonify({'csrf_token': generate_csrf()}) 
+
+@app.route('/api/v1/posters/<filename>', methods=['GET'])
+def get_movie_poster(filename):
+    poster_path = os.path.join(UPLOADS_FOLDER, filename)
+
+    if os.path.isfile(poster_path):
+        return send_from_directory(UPLOADS_FOLDER, filename)
+    else:
+        return jsonify({'error': 'Poster not found'}), 404
 
 
 ###

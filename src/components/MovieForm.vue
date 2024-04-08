@@ -33,6 +33,23 @@ import { ref, onMounted  } from 'vue';
 const successMessage = ref('');
 const errorMessages = ref([]);
 
+let csrf_token = ref(""); 
+
+function getCsrfToken() { 
+
+  fetch('/api/v1/csrf-token') 
+  .then((response) => response.json()) 
+  .then((data) => { 
+    console.log(data); 
+    csrf_token.value = data.csrf_token;
+    //saveMovie(); 
+  }) 
+} 
+
+onMounted(() => { 
+  getCsrfToken(); 
+}); 
+
 const movie = ref({
   title: '',
   description: '',
@@ -51,7 +68,7 @@ const saveMovie = () => {
     method: 'POST',
     body: formData, 
     headers: { 
-      'X-CSRFToken': csrf_token.value 
+      'X-CSRFToken': csrf_token.value
     }
   })
   .then(function (response) { 
@@ -65,28 +82,13 @@ const saveMovie = () => {
     //console.log(data); 
   }) 
   .catch(function (error) { 
+    console.error('There was a problem with the fetch operation:', error);
     successMessage.value = '';
     errorMessages.value = ['Failed to save movie. Please try again.'];
     
     //console.log(error); 
   });
 };
-
-let csrf_token = ref(""); 
-
-function getCsrfToken() { 
-
-  fetch('/api/v1/csrf-token') 
-  .then((response) => response.json()) 
-  .then((data) => { 
-    console.log(data); 
-    csrf_token.value = data.csrf_token; 
-  }) 
-} 
-
-onMounted(() => { 
-  getCsrfToken(); 
-}); 
 
 const handleFileChange = (event) => {
     movie.value.poster = event.target.files[0];

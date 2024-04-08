@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-from __init__ import db
+from .__init__ import db
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
