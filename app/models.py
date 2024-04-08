@@ -3,17 +3,14 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+from __init__ import db
 
-Base = declarative_base()
-
-class Movie(Base):
-    __tablename__ = 'movies'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    description = Column(Text)
-    poster = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
+class Movie(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    poster = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(self, title, description, poster):
         self.title = title
